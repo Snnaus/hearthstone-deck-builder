@@ -22,7 +22,7 @@
     <div class='col-lg-8'>
         <div class='row'>
             <div class='col-lg-3'dir-paginate='card in cards | itemsPerPage: 12'>
-                <img src='{{card.img}}'>
+                <img class='cardImg' src='{{card.img}}' ng-click='addCard(card, deck)'>
             </div>
         </div>
         <div class='row text-center'>
@@ -30,6 +30,7 @@
         </div>
     </div>
     <div class='col-lg-4'>
+        <div class='col-lg-2'><h5>{{cardCount}}</h5></div>
         <div class='col-lg-12' ng-repeat='card in deck'>{{card.qty}}  {{card.name}} {{card.cost}}</div>
     </div>
 </div>

@@ -38,4 +38,21 @@ angular.module('workspaceApp')
       }
     }
     
+    $scope.deck = [];
+    $scope.cardCount = 0;
+    $scope.addCard = function(card, deck){
+      if(deck.length == 0 || deck.reduce(function(agg, curr){ return agg + curr.qty; }, 0) < 30){
+        var inDeck = deck.map(function(car){ return car.id; });
+        inDeck = inDeck.indexOf(card.id);
+        if(inDeck == -1){
+          card.qty = 1;
+          deck.push(card);
+        }else if(card.qty < 2){
+          card.qty = card.qty + 1;
+        }
+      }
+    
+      $scope.cardCount = deck.reduce(function(agg, curr){ return agg + curr.qty; }, 0);
+    };
+    
   });
