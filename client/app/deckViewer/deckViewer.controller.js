@@ -24,7 +24,6 @@ angular.module('workspaceApp')
         return card;
       });
       
-      console.log($scope.rawCards);
       $scope.cards = $scope.rawCards;
       
     });
@@ -55,4 +54,12 @@ angular.module('workspaceApp')
       $scope.cardCount = deck.reduce(function(agg, curr){ return agg + curr.qty; }, 0);
     };
     
+    $scope.removeCard = function(card, deck){
+      if(card.qty > 1){
+        card.qty = card.qty - 1;
+      }else{
+        var garbage = deck.splice(deck.map(function(car){ return car.id; }).indexOf(card.id), 1);
+        $scope.cardCount = deck.reduce(function(agg, curr){ return agg + curr.qty; }, 0);
+      }
+    };
   });
