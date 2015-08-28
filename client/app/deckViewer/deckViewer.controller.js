@@ -2,14 +2,40 @@
 
 angular.module('workspaceApp')
   .controller('DeckViewerCtrl', function ($scope, $http) {
+    $scope.status = {
+        isopen: false
+      };
+    
+    $scope.toggleDropdown = function($event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+      $scope.status.isopen = !$scope.status.isopen;
+    };
+    
     $http.get('/api/Cardss/').success(function(data){
       
-      $scope.cards = Object.keys(data[0].cards).filter(function(key){ return ['Credits', 'Debug', 'Hero Skins', 'Missions', 'Tavern Brawl'].indexOf(key) == -1; }).map(function(key){ return data[0].cards[key]; }).reduce(function(agg, curr){
+      $scope.rawCards = Object.keys(data[0].cards).filter(function(key){ return ['Credits', 'Debug', 'Hero Skins', 'Missions', 'Tavern Brawl'].indexOf(key) == -1; }).map(function(key){ return data[0].cards[key]; }).reduce(function(agg, curr){
         return agg.concat(curr);
       }).filter(function(card){ return card.collectible && card.type != 'Hero'; }).map(function(card){
         card.img = 'https://wow.zamimg.com/images/hearthstone/cards/enus/original/' + card.id + '.png';
+        if(!card.playerClass){
+          card.playerClass = 'Neutral';
+        }
         return card;
       });
       
+      console.log($scope.rawCards);
+      $scope.cards = $scope.rawCards;
+      
     });
+    
+    $scope.heroes = ['Warrior', 'Shaman', 'Hunter', 'Druid', 'Rogue', 'Mage', 'Priest', 'Warlock', 'Paladin', 'Neutral', 'All'];
+    $scope.searchClass = function(hero){
+      if(hero != 'All'){
+        $scope.cards = $scope.rawCards.filter(function(card){ return card.playerClass == hero; });
+      }else{
+        $scope.cards = $scope.rawCards;
+      }
+    }
+    
   });
