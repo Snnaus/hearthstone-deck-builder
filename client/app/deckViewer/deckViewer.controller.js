@@ -3,7 +3,10 @@
 angular.module('workspaceApp')
   .controller('DeckViewerCtrl', function ($scope, $http) {
     $scope.status = {
-        isopen: false
+        isopen: false,
+        building: false,
+        hero: 'Neutral',
+        mana: 'All',
       };
     
     $scope.toggleDropdown = function($event) {
@@ -22,20 +25,17 @@ angular.module('workspaceApp')
           card.playerClass = 'Neutral';
         }
         return card;
-      });
+      }).sort(function(a,b){ return a.cost - b.cost});
       
-      $scope.cards = $scope.rawCards;
+      $scope.cards = $scope.rawCards.filter(function(card){ return card.playerClass == 'Neutral'; });
       
     });
-    
-    $scope.heroes = ['Warrior', 'Shaman', 'Hunter', 'Druid', 'Rogue', 'Mage', 'Priest', 'Warlock', 'Paladin', 'Neutral', 'All'];
+    var rawHeroes = ['Warrior', 'Shaman', 'Hunter', 'Druid', 'Rogue', 'Mage', 'Priest', 'Warlock', 'Paladin', 'Neutral'];
+    $scope.heroes = rawHeroes;
     $scope.searchClass = function(hero){
-      if(hero != 'All'){
-        $scope.cards = $scope.rawCards.filter(function(card){ return card.playerClass == hero; });
-      }else{
-        $scope.cards = $scope.rawCards;
-      }
-    }
+      updateCards($scope.status.mana, hero);
+      $scope.status.hero = hero;
+    };
     
     $scope.deck = [];
     $scope.cardCount = 0;
@@ -46,11 +46,12 @@ angular.module('workspaceApp')
         if(inDeck == -1){
           card.qty = 1;
           deck.push(card);
-        }else if(card.qty < 2){
+        }else if(card.qty < 2 && card.rarity != 'Legendary'){
           card.qty = card.qty + 1;
         }
       }
     
+      deck = deck.sort(function(a, b){ return a.cost - b.cost; });
       $scope.cardCount = deck.reduce(function(agg, curr){ return agg + curr.qty; }, 0);
     };
     
@@ -59,7 +60,34 @@ angular.module('workspaceApp')
         card.qty = card.qty - 1;
       }else{
         var garbage = deck.splice(deck.map(function(car){ return car.id; }).indexOf(card.id), 1);
-        $scope.cardCount = deck.reduce(function(agg, curr){ return agg + curr.qty; }, 0);
       }
+      $scope.cardCount = deck.reduce(function(agg, curr){ return agg + curr.qty; }, 0);
+    };
+    
+    $scope.selectHero = function(hero){
+      $scope.status.building = true;
+      updateCards($scope.status.mana, hero);
+      $scope.heroes = [hero, 'Neutral'];
+      $scope.status.hero = hero;
+    };
+    
+    var updateCards = function(cost, hero){
+      if(cost == 'All'){
+        $scope.cards = $scope.rawCards.filter(function(card){ return card.playerClass == hero; });
+      }else if(cost != '7+'){
+        $scope.cards = $scope.rawCards.filter(function(card){ return card.playerClass == hero && card.cost == cost; });
+      }else{
+        $scope.cards = $scope.rawCards.filter(function(card){ return card.playerClass == hero && card.cost >= 7; });
+      }
+    };
+    
+    $scope.searchMana = function(mana){
+      if(mana != $scope.status.mana){
+        $scope.status.mana = mana;
+      }else{
+        $scope.status.mana = 'All';
+      }
+      
+      updateCards($scope.status.mana, $scope.status.hero);
     };
   });
