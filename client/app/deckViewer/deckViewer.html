@@ -2,7 +2,7 @@
 
 
 <div class='container'>
-    <div class='row'>
+    <div class='row' ng-hide='cardCount == 30'>
         <div class='colf-lg-8'>
             <div class='col-lg-4 inline-block'>
                 <h1 class='col-lg-1' ng-repeat="number in [0,1,2,3,4,5,6,'7+']" ng-click='searchMana(number)'>{{number}}</h1>
@@ -19,14 +19,27 @@
             </div>
         </div>
     </div>
-    <div class='col-lg-8'>
+    <div class='col-lg-8' ng-hide='cardCount == 30'>
         <div class='row'>
             <div class='col-lg-3'dir-paginate='card in cards | itemsPerPage: 12'>
-                <img class='cardImg' src='{{card.img}}' ng-click='addCard(card, deck)'>
+                <img class='cardImg ' src='{{card.img}}' ng-click='addCard(card, deck)'>
             </div>
         </div>
         <div class='row text-center'>
             <dir-pagination-controls></dir-pagination-controls>
+        </div>
+    </div>
+    <div class='container col-lg-8' ng-show='cardCount == 30'>
+        <div class='row'>
+            <button class='btn btn-info' ng-click='startGame(hand)' ng-hide='gameStarted'>Start Game</button>
+            <button class='btn btn-success' ng-click='drawCard(hand)' ng-show='gameStarted && !mull'>Draw next card</button>
+            <button class='btn btn-default' ng-click='mulligan(hand)' ng-show='mull'>Mulligan selected</button>
+            <button class='btn btn-warning' ng-click='resetGame(hand)' ng-show='gameStarted'>Reset the Game</button>
+        </div>
+        <div class='row'>
+            <div class='col-lg-3' ng-repeat='card in hand track by $index'>
+                <img src='{{card.img}}' ng-class="{selectedd: card.selected == true, cardImg: true}" ng-click='selectCard(card, mull)'>
+            </div>
         </div>
     </div>
     <div class='col-lg-4' ng-show='status.building'>

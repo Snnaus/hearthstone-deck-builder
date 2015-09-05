@@ -90,4 +90,44 @@ angular.module('workspaceApp')
       
       updateCards($scope.status.mana, $scope.status.hero);
     };
+    
+    $scope.gameStarted = false;
+    $scope.mull = false;
+    $scope.hand = [];
+    $scope.simDeck = [];
+    //This is the mulligan and game draw simulator functions
+    $scope.startGame = function(hand){
+      $scope.gameStarted = true;
+      $scope.mull = true;
+      $scope.deck.forEach(function(card){
+        for(var i = 0; i<card.qty; i++){
+          $scope.simDeck.push(card);
+        }
+      });
+      drawCards(hand, $scope.deck, 3);
+    };
+    
+    function drawCards(hand, deck, count){
+      if(!count){
+        count = 1;
+      }
+      
+      for(var i=0; i<count; i++){
+        hand.push(deck.splice(Math.floor(Math.random()*deck.length),1)[0]);
+      }
+      console.log(hand, deck);
+    }
+    $scope.selected = 'notSel';
+    
+    $scope.selectCard = function(card, mull){
+      //console.log(card, mull);
+      if(mull && card.selected !== undefined){
+        card.selected = !card.selected;
+      }else if(card.selected === undefined){
+        card.selected = true;
+      }
+    };
+    
+    
+    
   });
